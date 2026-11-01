@@ -13,10 +13,10 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%237c3aed'/%3E%3C/svg%3E" />
-  <title>知识星图 · 交互原型 v1.0（本地编辑 + 只读发布）</title>
-  <link rel="stylesheet" href="styles.css?v=17" />
-  <link rel="stylesheet" href="designs/designs.css?v=17" />
-  <link rel="stylesheet" href="obsidian.css?v=17" />
+  <title>知识星图 · 交互原型 v1.1（手机所有者编辑）</title>
+  <link rel="stylesheet" href="styles.css?v=18" />
+  <link rel="stylesheet" href="designs/designs.css?v=18" />
+  <link rel="stylesheet" href="obsidian.css?v=18" />
 </head>
 <body>
   <div id="app">
@@ -53,6 +53,7 @@
         </div>
         <div class="vault-actions">
           <button id="vault-new" class="icon-btn" title="新建笔记" aria-label="新建笔记">＋</button>
+          <button id="vault-owner" class="icon-btn owner-btn" title="所有者登录 / GitHub 发布" aria-label="所有者登录">⚿</button>
           <button id="sidebar-collapse" class="icon-btn desktop-only" title="收起分类栏" aria-label="收起分类栏" aria-expanded="true">«</button>
           <button id="sidebar-close" class="icon-btn mobile-only" aria-label="关闭分类栏">✕</button>
         </div>
@@ -100,6 +101,7 @@
             <button id="btn-export-md" class="more-item" role="menuitem">导出 Obsidian Vault（.zip）</button>
             <button id="btn-import-md" class="more-item" role="menuitem">导入 Markdown 笔记</button>
             <button id="btn-publish" class="more-item" role="menuitem">导出发布快照</button>
+            <button id="btn-publish-github" class="more-item" role="menuitem">发布到 GitHub Pages</button>
             <div class="more-sep"></div>
             <button id="btn-reset" class="more-item danger-text" role="menuitem">恢复示例数据</button>
           </div>
@@ -133,6 +135,7 @@
           <button id="empty-install" class="btn ghost hidden">安装到桌面</button>
         </div>
         <div class="empty-hint"><kbd>Ctrl O</kbd> 快速切换 · <kbd>Ctrl P</kbd> 命令面板</div>
+        <button id="empty-owner" class="owner-entry" type="button">所有者登录 · 开启手机编辑</button>
       </div>
 
       <section id="graph-wrap" aria-label="3D 知识星图">
@@ -284,6 +287,44 @@
   <div id="mobile-overlay" class="mobile-overlay hidden"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+  <div id="owner-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="owner-title">
+    <div class="modal-backdrop" data-close-owner></div>
+    <div class="modal-card owner-modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="history-eyebrow">OWNER · GITHUB</div>
+          <h2 id="owner-title">所有者编辑</h2>
+        </div>
+        <button id="owner-close" class="icon-btn" aria-label="关闭所有者设置">✕</button>
+      </div>
+      <p class="owner-desc">
+        这是一个公开只读站点。粘贴一个仅限 <strong>myfirstname600-cmd/Obsidian</strong> 仓库
+        <strong>Contents: Read and write</strong> 的 GitHub Token，即可在手机/本机开启编辑，并直接把发布快照写回 GitHub Pages。
+      </p>
+      <label class="owner-field">
+        <span>Fine-grained GitHub Token</span>
+        <input id="owner-token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_..." />
+      </label>
+      <div class="owner-repo">
+        <span id="owner-status">未连接</span>
+        <code>prototype/published-vault.js → main</code>
+      </div>
+      <div class="owner-steps">
+        <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">打开 GitHub Token 页面</a>
+        <span> → Fine-grained token → 选择仓库 Obsidian → Contents: Read and write</span>
+      </div>
+      <div class="owner-warning">
+        Token 只保存在当前设备浏览器 localStorage；不会写入仓库。请使用最小权限 Token，并设置过期时间。共享设备建议用完清除。
+      </div>
+      <div class="owner-actions">
+        <button id="owner-clear" class="btn tiny" type="button">清除 Token</button>
+        <span class="owner-spacer"></span>
+        <button id="owner-cancel" class="btn tiny" type="button">取消</button>
+        <button id="owner-connect" class="btn primary tiny" type="button">验证并启用编辑</button>
+      </div>
+    </div>
+  </div>
+
   <div id="history-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="history-title">
     <div class="modal-backdrop" data-close-history></div>
     <div class="modal-card history-modal-card">
@@ -319,12 +360,12 @@
     </div>
   </div>
 
-  <script src="vendor/3d-force-graph.min.js?v=17"></script>
-  <script src="vendor/jszip.min.js?v=17"></script>
-  <script src="data.js?v=17"></script>
-  <script src="published-vault.js?v=17"></script>
-  <script src="markdown.js?v=17"></script>
-  <script src="app.js?v=17"></script>
+  <script src="vendor/3d-force-graph.min.js?v=18"></script>
+  <script src="vendor/jszip.min.js?v=18"></script>
+  <script src="data.js?v=18"></script>
+  <script src="published-vault.js?v=18"></script>
+  <script src="markdown.js?v=18"></script>
+  <script src="app.js?v=18"></script>
   <script>
     if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
       window.addEventListener('load', function () {

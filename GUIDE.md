@@ -38,6 +38,18 @@
 
 线上内容来自 `prototype/published-vault.js` 发布快照。
 
+### 3. 手机/远程所有者编辑
+
+在线上只读页登录 GitHub Token 后，可在手机或任意设备进入编辑模式：
+
+1. 点空工作区底部「所有者登录 · 开启手机编辑」，或左侧栏锁图标 `⚿`；
+2. 粘贴一个有 **Contents: Read and write** 权限的细粒度 Token；
+3. 验证成功后页面切换为可编辑；
+4. 编辑后左下 `⋯` →「发布到 GitHub Pages」；
+5. GitHub Actions 自动更新线上快照，约 1 分钟后刷新可见。
+
+Token 只保存在当前设备 localStorage，不会写入仓库；游客没有 Token 时仍是只读。
+
 ---
 
 ## 二、初始状态
@@ -176,13 +188,27 @@
 - **导出当前笔记 Markdown**
   - 单篇 `.md` 下载。
 
-### 13. 备份
+### 13. 手机所有者编辑 / 发布
+
+- 线上空工作区「所有者登录 · 开启手机编辑」或侧栏 `⚿`；
+- 需要细粒度 GitHub Token：
+  1. GitHub → Settings → Developer settings → Personal access tokens → **Fine-grained tokens**；
+  2. Resource owner 选 `myfirstname600-cmd`；
+  3. Repository access → Only select repositories → 选 `Obsidian`；
+  4. Repository permissions → **Contents: Read and write**；Metadata 会自动只读；
+  5. 设置过期时间并生成，复制 `github_pat_...`；
+  6. 粘贴到应用「所有者编辑」弹窗，验证并启用。
+- 验证后直接编辑；`⋯` →「发布到 GitHub Pages」提交 `prototype/published-vault.js`；
+- 约 1 分钟 Pages 更新，刷新/重开 PWA 可见；
+- 同一时间建议只在一台设备编辑并发布，避免覆盖。
+
+### 14. 备份
 
 - `⋯` →「导出备份 JSON / 导入备份 JSON」；
 - JSON 包含笔记、分类、关系和版本历史；
 - 导入会覆盖当前数据，先导出再导入。
 
-### 14. PWA 安装 / 离线
+### 15. PWA 安装 / 离线
 
 线上 HTTPS 或本地 `localhost` 下：
 
@@ -289,6 +315,8 @@ git push
 - 在线/离线状态
 - GitHub Pages Actions 部署
 - 本地编辑 + 线上只读
+- GitHub Token 手机/远程所有者编辑
+- 一键提交 `published-vault.js` 到 GitHub Pages
 - 发布快照 `published-vault.js`
 - 只读模式隐藏所有编辑入口
 
@@ -299,7 +327,8 @@ git push
 - 本地数据保存在当前浏览器 `localStorage`；换浏览器、换设备不同步。
 - 线上访客只读，读取 `prototype/published-vault.js`。
 - 这是纯静态发布方案，不是账号级鉴权；源码和发布数据公开。
-- 当前没有：账号登录、私有内容、跨设备同步、附件上传、完整 Markdown 文件系统。
+- 当前没有：完整账号体系、私有内容、自动跨设备同步、附件上传、完整 Markdown 文件系统。
+- 手机编辑使用细粒度 Token，Token 保存在该设备浏览器；请使用最小权限并设置过期时间。多人/多设备同时编辑同一份快照会互相覆盖。
 - Markdown 源码是 HTML 内容的转换层，内部存储仍为 HTML。
 - Obsidian callout、`![[嵌入]]`、frontmatter 直接编辑尚未完整支持。
 

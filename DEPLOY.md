@@ -70,7 +70,23 @@ python -m http.server 8765 --bind 127.0.0.1
 2. 修改 `prototype/service-worker.js` 的 `CACHE_VERSION`；
 3. push 后用户刷新即可拿到新版本。
 
-## 六、数据与只读说明
+## 六、手机 / 远程所有者编辑
+
+线上默认只读。所有者可在手机或任意设备解锁编辑：
+
+1. 点空工作区「所有者登录 · 开启手机编辑」或侧栏锁图标 `⚿`；
+2. 在 GitHub 创建 Fine-grained Token：
+   - Repository access：只选 `Obsidian`；
+   - Repository permissions → **Contents: Read and write**；
+   - Metadata: Read-only；
+   - 建议设置过期时间。
+3. 粘贴 `github_pat_...`，点「验证并启用编辑」；
+4. 编辑后左下 `⋯` →「发布到 GitHub Pages」；
+5. GitHub Actions 自动重新部署，约 1 分钟后刷新可见。
+
+Token 只保存在该设备浏览器 localStorage，不会进入仓库。共享设备用完请清除。
+
+## 七、数据与只读说明
 
 - **本地编辑**：数据保存在当前浏览器 `localStorage`；换域名、换设备不会同步，部署前先导出 JSON 备份或 Obsidian Vault。
 - **线上访客**：只读，读取 `published-vault.js`，不会写入 localStorage。

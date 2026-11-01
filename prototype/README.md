@@ -1,4 +1,4 @@
-# 知识星图 · 交互原型 v1.0（本地编辑 + 只读发布）
+# 知识星图 · 交互原型 v1.1（手机所有者编辑）
 
 视觉统一成 **Obsidian Light**：白底、浅灰侧栏/标签栏、紫色强调色、细边框；保留黄金比例星图卡片。界面按 Obsidian 桌面端组织：左侧功能条 + 文件树，中间标签页 + 编辑器/图谱，右侧大纲/反向链接，底部状态栏。**打开网站默认进入空工作区（无标签）**，从左侧文件树、空工作区按钮或 Ribbon 开始。功能上参考 Obsidian 的核心工作流（双向链接、反向链接、命令面板、快速切换、大纲、图谱）；当前是浏览器原型，不是 Obsidian 插件，也不会直接读取桌面 Obsidian vault。
 
@@ -12,7 +12,8 @@
 - **Markdown 源码 + 实时预览**：笔记页右上 `M↓`（或 `Ctrl/Cmd+Shift+M`）进入源码模式，左侧 Markdown 文本、右侧实时预览；编辑会同步回富文本内容，退出时正常保存，阅读/切换标签/关闭标签都会先处理源码。
 - **PWA 安装 / 离线**：`manifest.webmanifest` + Service Worker；Android Chrome「添加到主屏幕」、Windows Edge/Chrome「安装应用」后独立窗口运行；断网刷新仍能打开应用（数据仍在 localStorage）；状态栏显示在线/离线。
 - **GitHub Pages 部署**：`.github/workflows/pages.yml` 会把 `prototype/` 作为站点根目录发布；步骤见仓库根目录 [DEPLOY.md](../DEPLOY.md)。
-- **本地编辑 / 线上只读**：`file://` 和 `localhost` 可编辑；非 localhost 域名（GitHub Pages）自动只读。线上读取 `published-vault.js` 快照，访客不写 localStorage。左侧 `⋯` →「导出发布快照」生成该文件；命令面板可「预览访客只读页」。
+- **本地编辑 / 线上只读**：`file://` 和 `localhost` 可编辑；非 localhost 域名（GitHub Pages）默认只读。线上读取 `published-vault.js` 快照，访客不写 localStorage。左侧 `⋯` →「导出发布快照」生成该文件；命令面板可「预览访客只读页」。
+- **手机/远程所有者编辑**：线上点「所有者登录 · 开启手机编辑」或侧栏 `⚿`，粘贴仅限该仓库 `Contents: Read and write` 的 GitHub Token；验证后解锁编辑，`⋯` →「发布到 GitHub Pages」直接提交 `prototype/published-vault.js`。Token 只存本机 localStorage，不写入仓库。
 - **Markdown 互通**：左下 `⋯` 或命令面板可「导出 Obsidian Vault（.zip）」——按分类生成文件夹，每篇笔记带 `title/category/tags/updated` frontmatter，双链保持 `[[标题]]`；也支持「导入 Markdown 笔记」（多选 `.md`，读取 frontmatter/标题/标签/分类，支持标题、列表、引用、代码块、表格、双链）和导出当前笔记 `.md`。
 - **知识点独立页面**：点左侧文件或星图节点，跳转到 `#/note/<知识点 id>` 的独立标签页，不再弹右侧抽屉。
 - **新建不弹窗**：选中一级分类后点「新建」，直接在该分类下生成空白文件并打开页面，标题输入框自动聚焦、全选，直接输入就是重命名。

@@ -1,4 +1,4 @@
-/* 知识星图 · 交互原型 v1.0（本地编辑 + 只读发布）
+/* 知识星图 · 交互原型 v1.1（本地 / 手机所有者编辑 + 只读发布）
  * 08 Quiet 定稿方向。纯前端、假数据、localStorage。
  * 关键变化：
  * - 树：一级分类 > 知识点文件；只能展开，不能收起；新增直接落文件
@@ -27,7 +27,17 @@
   const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '']);
   const IS_LOCAL_DEV = location.protocol === 'file:' || LOCAL_HOSTS.has(location.hostname);
   const FORCED_READONLY = new URLSearchParams(location.search).get('readonly') === '1';
-  const READ_ONLY = FORCED_READONLY || !IS_LOCAL_DEV;
+  const OWNER_TOKEN_KEY = 'knowledge-nebula-github-token-v1';
+  const OWNER_REPO = {
+    owner: 'myfirstname600-cmd',
+    repo: 'Obsidian',
+    branch: 'main',
+    path: 'prototype/published-vault.js'
+  };
+  let STORED_OWNER_TOKEN = '';
+  try { STORED_OWNER_TOKEN = localStorage.getItem(OWNER_TOKEN_KEY) || ''; } catch (err) { /* storage unavailable */ }
+  const OWNER_MODE = !FORCED_READONLY && (IS_LOCAL_DEV || !!STORED_OWNER_TOKEN);
+  const READ_ONLY = FORCED_READONLY || (!IS_LOCAL_DEV && !STORED_OWNER_TOKEN);
   const LOCAL_READONLY_PREVIEW = IS_LOCAL_DEV && FORCED_READONLY;
 
   const DESIGN_ID = document.documentElement.getAttribute('data-design') || '8';
@@ -88,6 +98,16 @@
     emptyInstall: $('#empty-install'),
     statusNetwork: $('#status-network'),
     vaultNew: $('#vault-new'),
+    vaultOwner: $('#vault-owner'),
+    emptyOwner: $('#empty-owner'),
+    ownerModal: $('#owner-modal'),
+    ownerToken: $('#owner-token'),
+    ownerStatus: $('#owner-status'),
+    ownerConnect: $('#owner-connect'),
+    ownerClear: $('#owner-clear'),
+    ownerClose: $('#owner-close'),
+    ownerCancel: $('#owner-cancel'),
+    btnPublishGithub: $('#btn-publish-github'),
     sidebarGraph: $('#sidebar-graph'),
     sidebarGraphCount: $('#sidebar-graph-count'),
     statusFile: $('#status-file'),
@@ -172,6 +192,11 @@
     readOnly: READ_ONLY,
     readOnlyPreview: LOCAL_READONLY_PREVIEW,
     publishedAt: null,
+    ownerMode: OWNER_MODE,
+    ownerToken: STORED_OWNER_TOKEN,
+    ownerVerified: IS_LOCAL_DEV,
+    ownerBusy: false,
+    lastCommitUrl: '',
     selectedId: null,
     selectedCategoryId: null,
     expanded: new Set(),
@@ -295,6 +320,14 @@
       if (published) return published;
       if (state.readOnlyPreview) return loadLocalData();
       return defaultData();
+    }
+    if (state.ownerMode && !IS_LOCAL_DEV) {
+      try {
+        if (!localStorage.getItem(STORAGE_KEY)) {
+          const published = loadPublishedData();
+          if (published) return published;
+        }
+      } catch (err) { /* ignore */ }
     }
     return loadLocalData();
   }
@@ -2270,7 +2303,8 @@
       els.statusWords.textContent = '';
       els.statusSave.textContent = state.readOnly ? '只读' : '本地存储';
       els.statusSave.className = state.readOnly ? 'saved' : '';
-      els.statusVault.textContent = state.readOnly ? '已发布' : '知识星图';
+      els.statusVault.textContent = state.readOnly ? '已发布'
+        : state.ownerToken && !IS_LOCAL_DEV ? 'GitHub 编辑' : '知识星图';
       return;
     }
     if (state.noteMode && kp) {
@@ -2281,15 +2315,17 @@
       els.statusSave.textContent = state.readOnly ? '只读' : els.saveStatus.textContent;
       els.statusSave.className = state.readOnly ? 'saved' : els.saveStatus.className;
       els.statusVault.textContent = state.readOnly ? '已发布'
-        : state.readingMode ? '阅读视图'
-          : state.sourceMode ? 'Markdown 源码' : '知识星图';
+        : state.ownerToken && !IS_LOCAL_DEV ? 'GitHub 编辑'
+          : state.readingMode ? '阅读视图'
+            : state.sourceMode ? 'Markdown 源码' : '知识星图';
     } else {
       els.statusFile.textContent = '知识网络';
       els.statusWords.textContent = `${state.kps.length} 篇笔记`;
       els.statusBacklinks.textContent = `${countLinks()} 条连接`;
       els.statusSave.textContent = state.readOnly ? '只读' : '本地存储';
       els.statusSave.className = state.readOnly ? 'saved' : '';
-      els.statusVault.textContent = state.readOnly ? '已发布' : '知识星图';
+      els.statusVault.textContent = state.readOnly ? '已发布'
+        : state.ownerToken && !IS_LOCAL_DEV ? 'GitHub 编辑' : '知识星图';
     }
   }
 
@@ -2848,6 +2884,7 @@
         { label: '适配星图视角', hint: '⌖', run: () => fitGraph(44) },
         { label: '返回知识网络', hint: 'Esc', run: () => goDashboard() },
         { label: state.readingMode ? '退出阅读视图' : '切换阅读视图', hint: 'Ctrl+E', run: () => setReadingMode(!state.readingMode) },
+        { label: '所有者登录 / 手机编辑', hint: 'GitHub', run: () => openOwnerModal() },
         { label: '安装到桌面 / 主屏幕', hint: 'PWA', run: () => installPwa() }
       ];
     }
@@ -2885,6 +2922,8 @@
       { label: '导出当前笔记 Markdown', hint: '.md', run: () => exportCurrentMarkdown() },
       { label: '导入 Markdown 笔记', hint: 'Obsidian', run: () => triggerMarkdownImport() },
       { label: '导出发布快照', hint: '只读站', run: () => exportPublishedVault() },
+      { label: '发布到 GitHub Pages', hint: 'GitHub', run: () => publishToGitHub() },
+      { label: 'GitHub 发布设置 / 所有者登录', hint: 'Token', run: () => openOwnerModal() },
       { label: '预览访客只读页', hint: '新标签', run: () => previewReadOnly() },
       { label: '安装到桌面 / 主屏幕', hint: 'PWA', run: () => installPwa() },
       { label: '恢复示例数据', hint: '重置', run: () => resetPrototype() }
@@ -3030,14 +3069,271 @@
     els.statusNetwork.title = online ? '在线，本地数据无需网络' : '离线模式，已缓存应用可打开';
   }
 
+  function updateOwnerButton() {
+    if (!els.vaultOwner) return;
+    const connected = !!state.ownerToken;
+    els.vaultOwner.classList.toggle('is-active', connected);
+    els.vaultOwner.title = connected
+      ? 'GitHub 已连接 · 点击管理 / 发布'
+      : state.readOnly ? '所有者登录 / 手机编辑' : 'GitHub 发布设置';
+  }
+
   function applyReadOnlyMode() {
     document.body.classList.toggle('readonly-mode', state.readOnly);
+    document.body.classList.toggle('owner-mode', !state.readOnly && !!state.ownerToken);
+    updateOwnerButton();
     if (!state.readOnly) return;
     els.title.readOnly = true;
     els.categorySelect.disabled = true;
     els.tags.readOnly = true;
     els.editor.contentEditable = 'false';
     setSaveStatus('只读 · 已发布', 'saved');
+  }
+
+  function applyOwnerMode() {
+    state.readOnly = false;
+    state.ownerMode = true;
+    document.body.classList.remove('readonly-mode');
+    document.body.classList.toggle('owner-mode', !!state.ownerToken);
+    state.history = loadHistory();
+    if (state.noteMode) {
+      els.title.readOnly = false;
+      els.categorySelect.disabled = false;
+      els.tags.readOnly = false;
+      els.editor.contentEditable = 'true';
+      renderInspector();
+    }
+    renderTree();
+    updateOwnerButton();
+    updateStatusBar();
+    setSaveStatus(state.ownerToken ? '所有者编辑 · GitHub 已连接' : '所有者编辑 · 未连接 GitHub', state.ownerToken ? 'saved' : '');
+  }
+
+  function openOwnerModal() {
+    if (!els.ownerModal) return;
+    if (FORCED_READONLY) {
+      toast('当前是只读预览模式；请去掉 ?readonly=1 后再登录');
+      return;
+    }
+    if (els.ownerStatus) {
+      els.ownerStatus.classList.remove('is-ok', 'is-error');
+      els.ownerStatus.textContent = state.ownerToken ? '已保存 Token · 可更新' : '未连接';
+      if (state.ownerToken) els.ownerStatus.classList.add('is-ok');
+    }
+    if (els.ownerToken) {
+      els.ownerToken.value = '';
+      els.ownerToken.placeholder = state.ownerToken ? '已保存 Token；输入新 Token 可替换' : 'github_pat_...';
+    }
+    els.ownerModal.classList.remove('hidden');
+    setTimeout(() => { if (els.ownerToken) els.ownerToken.focus(); }, 30);
+  }
+
+  function closeOwnerModal() {
+    if (els.ownerModal) els.ownerModal.classList.add('hidden');
+  }
+
+  function setOwnerStatus(text, ok) {
+    if (!els.ownerStatus) return;
+    els.ownerStatus.textContent = text;
+    els.ownerStatus.classList.toggle('is-ok', !!ok);
+    els.ownerStatus.classList.toggle('is-error', ok === false);
+  }
+
+  function githubHeaders(token) {
+    return {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    };
+  }
+
+  async function githubApi(token, path, options) {
+    const opts = options || {};
+    const headers = { ...githubHeaders(token), ...(opts.headers || {}) };
+    if (opts.body && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
+    const response = await fetch(`https://api.github.com${path}`, { ...opts, headers });
+    if (!response.ok) {
+      let message = `GitHub API ${response.status}`;
+      try {
+        const data = await response.json();
+        if (data && data.message) message = data.message;
+      } catch (err) { /* ignore */ }
+      const error = new Error(message);
+      error.status = response.status;
+      throw error;
+    }
+    return response;
+  }
+
+  async function validateOwnerToken(token) {
+    const path = `/repos/${OWNER_REPO.owner}/${OWNER_REPO.repo}`;
+    const response = await githubApi(token, path);
+    const repo = await response.json();
+    if (repo.permissions && repo.permissions.push === false) {
+      const error = new Error('这个 Token 没有该仓库的写入权限');
+      error.status = 403;
+      throw error;
+    }
+    return repo;
+  }
+
+  async function connectOwnerToken() {
+    if (state.ownerBusy) return;
+    const token = (els.ownerToken.value || '').trim();
+    if (!token) {
+      setOwnerStatus('请输入 GitHub Token', false);
+      return;
+    }
+    state.ownerBusy = true;
+    if (els.ownerConnect) {
+      els.ownerConnect.disabled = true;
+      els.ownerConnect.textContent = '验证中…';
+    }
+    setOwnerStatus('正在验证 GitHub 权限…', null);
+    try {
+      await validateOwnerToken(token);
+      try { localStorage.setItem(OWNER_TOKEN_KEY, token); } catch (err) { /* ignore */ }
+      state.ownerToken = token;
+      state.ownerVerified = true;
+      state.ownerMode = true;
+      applyOwnerMode();
+      setOwnerStatus('已连接，编辑模式已开启', true);
+      closeOwnerModal();
+      toast('所有者编辑已开启；修改后可从 ⋯ 菜单发布');
+    } catch (err) {
+      setOwnerStatus(err.message || 'Token 验证失败', false);
+      toast('连接失败：' + (err.message || 'GitHub 验证失败'));
+    } finally {
+      state.ownerBusy = false;
+      if (els.ownerConnect) {
+        els.ownerConnect.disabled = false;
+        els.ownerConnect.textContent = '验证并启用编辑';
+      }
+    }
+  }
+
+  function clearOwnerToken() {
+    if (!window.confirm('清除本机保存的 GitHub Token？清除后手机/浏览器会回到只读模式。')) return;
+    try { localStorage.removeItem(OWNER_TOKEN_KEY); } catch (err) { /* ignore */ }
+    state.ownerToken = '';
+    state.ownerVerified = false;
+    state.ownerMode = IS_LOCAL_DEV;
+    closeOwnerModal();
+    if (!IS_LOCAL_DEV) {
+      state.readOnly = true;
+      applyReadOnlyMode();
+      toast('Token 已清除，回到只读模式');
+      setTimeout(() => location.reload(), 300);
+      return;
+    }
+    document.body.classList.remove('owner-mode');
+    updateOwnerButton();
+    setSaveStatus('所有者编辑 · 未连接 GitHub', '');
+    toast('Token 已清除');
+  }
+
+  function utf8ToBase64(text) {
+    const bytes = new TextEncoder().encode(text);
+    let binary = '';
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+    }
+    return btoa(binary);
+  }
+
+  function buildPublishedPayload() {
+    return {
+      app: 'knowledge-nebula',
+      version: 1,
+      exportedAt: nowIso(),
+      data: {
+        categories: state.categories,
+        kps: state.kps,
+        relations: state.relations
+      }
+    };
+  }
+
+  function buildPublishedText() {
+    return '/* Published read-only snapshot generated by Knowledge Nebula. */\n'
+      + 'window.PUBLISHED_VAULT = ' + JSON.stringify(buildPublishedPayload(), null, 2) + ';\n';
+  }
+
+  async function publishToGitHub() {
+    if (!state.ownerToken) {
+      openOwnerModal();
+      toast('先验证 GitHub Token 才能发布');
+      return;
+    }
+    if (state.ownerBusy) return;
+    closeMoreMenu();
+    flushSave();
+    state.ownerBusy = true;
+    const button = els.btnPublishGithub;
+    if (button) {
+      button.disabled = true;
+      button.textContent = '发布中…';
+    }
+    toast('正在提交到 GitHub…');
+    try {
+      const filePath = `/repos/${OWNER_REPO.owner}/${OWNER_REPO.repo}/contents/${OWNER_REPO.path}`;
+      let sha = null;
+      try {
+        const current = await githubApi(state.ownerToken, `${filePath}?ref=${OWNER_REPO.branch}`);
+        const data = await current.json();
+        sha = data.sha || null;
+      } catch (err) {
+        if (err.status !== 404) throw err;
+      }
+      const body = {
+        message: `publish: ${new Date().toISOString().slice(0, 19)}`,
+        content: utf8ToBase64(buildPublishedText()),
+        branch: OWNER_REPO.branch
+      };
+      if (sha) body.sha = sha;
+      const response = await githubApi(state.ownerToken, filePath, {
+        method: 'PUT',
+        body: JSON.stringify(body)
+      });
+      const data = await response.json();
+      state.lastCommitUrl = (data.commit && data.commit.html_url) || '';
+      state.publishedAt = nowIso();
+      setSaveStatus('已发布 · GitHub Pages 更新中', 'saved');
+      updateStatusBar();
+      toast('已提交发布；GitHub Pages 约 1 分钟内更新');
+    } catch (err) {
+      if (err.status === 401 || err.status === 403) {
+        toast('发布失败：Token 无效或没有 Contents 写权限');
+      } else {
+        toast('发布失败：' + (err.message || 'GitHub API 错误'));
+      }
+    } finally {
+      state.ownerBusy = false;
+      if (button) {
+        button.disabled = false;
+        button.textContent = '发布到 GitHub Pages';
+      }
+    }
+  }
+
+  async function validateStoredOwnerToken() {
+    if (!state.ownerToken || IS_LOCAL_DEV || state.readOnly) return;
+    try {
+      await validateOwnerToken(state.ownerToken);
+      state.ownerVerified = true;
+      updateOwnerButton();
+    } catch (err) {
+      if (err.status === 401 || err.status === 403) {
+        try { localStorage.removeItem(OWNER_TOKEN_KEY); } catch (e) { /* ignore */ }
+        state.ownerToken = '';
+        state.ownerVerified = false;
+        state.ownerMode = false;
+        state.readOnly = true;
+        applyReadOnlyMode();
+        toast('保存的 GitHub Token 已失效，已回到只读模式');
+      }
+    }
   }
 
   function initPwa() {
@@ -3111,6 +3407,18 @@
     if (els.btnExportMd) els.btnExportMd.addEventListener('click', exportMarkdownVault);
     if (els.btnImportMd) els.btnImportMd.addEventListener('click', triggerMarkdownImport);
     if (els.btnPublish) els.btnPublish.addEventListener('click', exportPublishedVault);
+    if (els.btnPublishGithub) els.btnPublishGithub.addEventListener('click', publishToGitHub);
+    [els.vaultOwner, els.emptyOwner].forEach((button) => {
+      if (button) button.addEventListener('click', openOwnerModal);
+    });
+    if (els.ownerClose) els.ownerClose.addEventListener('click', closeOwnerModal);
+    if (els.ownerCancel) els.ownerCancel.addEventListener('click', closeOwnerModal);
+    if (els.ownerConnect) els.ownerConnect.addEventListener('click', connectOwnerToken);
+    if (els.ownerClear) els.ownerClear.addEventListener('click', clearOwnerToken);
+    if (els.ownerModal) {
+      const ownerBackdrop = els.ownerModal.querySelector('[data-close-owner]');
+      if (ownerBackdrop) ownerBackdrop.addEventListener('click', closeOwnerModal);
+    }
     if (els.importMd) els.importMd.addEventListener('change', () => {
       const files = els.importMd.files ? Array.from(els.importMd.files) : [];
       els.importMd.value = '';
@@ -3319,6 +3627,7 @@
         if (!els.palette.classList.contains('hidden')) { closePalette(); return; }
         if (!els.moreMenu.classList.contains('hidden')) { closeMoreMenu(); return; }
         if (!els.historyModal.classList.contains('hidden')) { closeHistory(); return; }
+        if (els.ownerModal && !els.ownerModal.classList.contains('hidden')) { closeOwnerModal(); return; }
         if (state.sourceMode) { setSourceMode(false); return; }
         if (state.noteMode) { goDashboard(); return; }
         if (els.sidebar.classList.contains('open')) { closeSidebar(); return; }
@@ -3388,11 +3697,19 @@
     renderAll();
     renderTabs();
     updateHistoryCount();
-    setSaveStatus('原型数据 · 自动保存到本机', '');
+    if (state.ownerMode && !state.readOnly && state.ownerToken && !IS_LOCAL_DEV) {
+      setSaveStatus('所有者编辑 · GitHub 已连接', 'saved');
+    } else {
+      setSaveStatus('原型数据 · 自动保存到本机', '');
+    }
     initPwa();
     syncRoute();
     handleLaunchAction();
     updateStatusBar();
+    if (state.ownerMode && !state.readOnly && state.ownerToken && !IS_LOCAL_DEV) {
+      updateOwnerButton();
+      setTimeout(validateStoredOwnerToken, 500);
+    }
     if (!state.kps.length) toast('点左下「新建」开始记录');
   }
 
