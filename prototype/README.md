@@ -91,6 +91,7 @@
 
 ## 相关文档
 
+- 完整使用说明：[../GUIDE.md](../GUIDE.md)
 - 需求文档：[../docs/需求文档.md](../docs/需求文档.md)
 - 第一轮设计画廊：[designs/index.html](designs/index.html)
 - 第二轮留白方案：[designs/round2.html](designs/round2.html)

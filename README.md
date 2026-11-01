@@ -23,7 +23,8 @@ python -m http.server 8765 --bind 127.0.0.1
 
 ## 文档
 
-- [prototype/README.md](prototype/README.md)：当前功能、快捷键、限制
+- [GUIDE.md](GUIDE.md)：完整使用说明、快捷键、已实现功能、故障排查
+- [prototype/README.md](prototype/README.md)：开发视角的功能与限制
 - [docs/需求文档.md](docs/需求文档.md)：需求和交互修订记录
 
 ## 说明
