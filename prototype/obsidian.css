@@ -613,6 +613,25 @@ body.owner-mode:not(.readonly-mode) .vault-title::after {
   font-weight: 500;
   letter-spacing: 0.04em;
 }
+.vault-grip {
+  display: none;
+  color: #b9b9c0;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: -1px;
+  cursor: grab;
+}
+body.pwa-window .vault-head { -webkit-app-region: drag; app-region: drag; }
+body.pwa-window .vault-head button,
+body.pwa-window .vault-head .icon-btn,
+body.pwa-window .vault-head input { -webkit-app-region: no-drag; app-region: no-drag; }
+body.pwa-window .vault-title { cursor: grab; }
+body.pwa-window .vault-grip { display: inline-flex; align-items: center; align-self: center; }
+body.pwa-window .editor-tabs { -webkit-app-region: drag; app-region: drag; }
+body.pwa-window .editor-tabs .editor-tab,
+body.pwa-window .editor-tabs button,
+body.pwa-window .editor-tabs .tab-new,
+body.pwa-window .editor-tabs .icon-btn { -webkit-app-region: no-drag; app-region: no-drag; }
 .owner-btn { color: #7c3aed; }
 .owner-btn.is-active { background: #f5f3ff; color: #6d28d9; }
 .owner-entry {

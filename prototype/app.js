@@ -3337,7 +3337,16 @@
     }
   }
 
+  function applyPwaWindowMode() {
+    try {
+      const modes = ['window-controls-overlay', 'standalone', 'minimal-ui', 'fullscreen'];
+      const mode = modes.find((name) => window.matchMedia(`(display-mode: ${name})`).matches);
+      if (mode) document.body.classList.add('pwa-window', `pwa-${mode}`);
+    } catch (err) { /* older browsers */ }
+  }
+
   function initPwa() {
+    applyPwaWindowMode();
     updateNetworkStatus();
     window.addEventListener('online', () => {
       updateNetworkStatus();

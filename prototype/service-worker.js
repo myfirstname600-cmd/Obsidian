@@ -4,19 +4,19 @@
    - 发布快照 network-first，避免访客看到旧数据
    - 更新应用时请同步修改 CACHE_VERSION
 */
-const CACHE_VERSION = 'kn-v1.1.0-4';
+const CACHE_VERSION = 'kn-v1.1.0-5';
 const APP_SHELL = [
   './',
   './index.html',
-  './styles.css?v=20',
-  './designs/designs.css?v=20',
-  './obsidian.css?v=20',
-  './vendor/3d-force-graph.min.js?v=20',
-  './vendor/jszip.min.js?v=20',
-  './data.js?v=20',
-  './published-vault.js?v=20',
-  './markdown.js?v=20',
-  './app.js?v=20',
+  './styles.css?v=21',
+  './designs/designs.css?v=21',
+  './obsidian.css?v=21',
+  './vendor/3d-force-graph.min.js?v=21',
+  './vendor/jszip.min.js?v=21',
+  './data.js?v=21',
+  './published-vault.js?v=21',
+  './markdown.js?v=21',
+  './app.js?v=21',
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',
