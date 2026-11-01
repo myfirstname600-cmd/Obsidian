@@ -4,7 +4,7 @@
    - 发布快照 network-first，避免访客看到旧数据
    - 更新应用时请同步修改 CACHE_VERSION
 */
-const CACHE_VERSION = 'kn-v1.1.0-3';
+const CACHE_VERSION = 'kn-v1.1.0-4';
 const APP_SHELL = [
   './',
   './index.html',
