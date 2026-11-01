@@ -621,6 +621,41 @@ body.owner-mode:not(.readonly-mode) .vault-title::after {
   letter-spacing: -1px;
   cursor: grab;
 }
+.pwa-titlebar { display: none; }
+@media (min-width: 760px) {
+  body.pwa-window { --pwa-titlebar-h: 34px; }
+  body.pwa-window.pwa-window-controls-overlay {
+    --pwa-titlebar-h: max(34px, env(titlebar-area-height, 34px));
+  }
+  body.pwa-window .pwa-titlebar {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 300;
+    height: var(--pwa-titlebar-h);
+    align-items: center;
+    gap: 8px;
+    padding: 0 14px;
+    border-bottom: 1px solid #ececef;
+    background: #fbfbfc;
+    color: #4b4b50;
+    -webkit-app-region: drag;
+    app-region: drag;
+    user-select: none;
+    cursor: grab;
+  }
+  body.pwa-window #app { top: var(--pwa-titlebar-h); }
+  .pwa-titlebar-grip { color: #a1a1aa; font-size: 14px; letter-spacing: -1px; }
+  .pwa-titlebar-name { color: #3d3d40; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; }
+  .pwa-titlebar-sub {
+    color: #b1b1b8;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+}
 body.pwa-window .vault-head { -webkit-app-region: drag; app-region: drag; }
 body.pwa-window .vault-head button,
 body.pwa-window .vault-head .icon-btn,

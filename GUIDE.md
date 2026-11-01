@@ -215,6 +215,7 @@ Token 只保存在当前设备 localStorage，不会写入仓库；游客没有 
 - Windows Edge/Chrome：地址栏安装图标，或「安装应用」；
 - Android Chrome：菜单「添加到主屏幕」；
 - 安装后独立窗口运行；
+- Windows 安装版顶部有一条「⠿ 知识星图 KNOWLEDGE NEBULA」拖拽条，按住它即可移动窗口；侧栏和标签栏空白处也可拖动；
 - Service Worker 缓存应用壳和发布快照，断网可打开；
 - 本地编辑模式的离线数据仍在 `localStorage`。
 

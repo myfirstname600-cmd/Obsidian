@@ -3693,6 +3693,7 @@
 
   /* ------------------------------ init ------------------------------ */
   function init() {
+    applyPwaWindowMode();
     const data = loadData();
     state.categories = data.categories;
     state.kps = data.kps;
