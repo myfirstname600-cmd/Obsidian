@@ -81,7 +81,7 @@ python -m http.server 8765 --bind 127.0.0.1
    - Metadata: Read-only；
    - 建议设置过期时间。
 3. 粘贴 `github_pat_...`，点「验证并启用编辑」；
-4. 编辑后左下 `⋯` →「发布到 GitHub Pages」；
+4. 编辑后点笔记页底部「发布」，或左下 `⋯` →「发布到 GitHub Pages」；
 5. GitHub Actions 自动重新部署，约 1 分钟后刷新可见。
 
 Token 只保存在该设备浏览器 localStorage，不会进入仓库。共享设备用完请清除。

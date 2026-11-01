@@ -627,6 +627,8 @@ body.owner-mode:not(.readonly-mode) .vault-title::after {
 .owner-entry:hover { color: #7c3aed; }
 body:not(.readonly-mode) #empty-owner { display: none; }
 body:not(.owner-mode) #btn-publish-github { display: none !important; }
+.publish-note { display: none !important; }
+body.owner-mode .publish-note { display: inline-flex !important; }
 .owner-modal-card { width: min(520px, calc(100vw - 32px)); }
 .owner-desc {
   margin: 0 0 14px;

@@ -108,6 +108,7 @@
     ownerClose: $('#owner-close'),
     ownerCancel: $('#owner-cancel'),
     btnPublishGithub: $('#btn-publish-github'),
+    btnPublishNote: $('#btn-publish-note'),
     sidebarGraph: $('#sidebar-graph'),
     sidebarGraphCount: $('#sidebar-graph-count'),
     statusFile: $('#status-file'),
@@ -3408,6 +3409,7 @@
     if (els.btnImportMd) els.btnImportMd.addEventListener('click', triggerMarkdownImport);
     if (els.btnPublish) els.btnPublish.addEventListener('click', exportPublishedVault);
     if (els.btnPublishGithub) els.btnPublishGithub.addEventListener('click', publishToGitHub);
+    if (els.btnPublishNote) els.btnPublishNote.addEventListener('click', publishToGitHub);
     [els.vaultOwner, els.emptyOwner].forEach((button) => {
       if (button) button.addEventListener('click', openOwnerModal);
     });

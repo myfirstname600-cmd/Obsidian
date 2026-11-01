@@ -198,7 +198,7 @@ Token 只保存在当前设备 localStorage，不会写入仓库；游客没有 
   4. Repository permissions → **Contents: Read and write**；Metadata 会自动只读；
   5. 设置过期时间并生成，复制 `github_pat_...`；
   6. 粘贴到应用「所有者编辑」弹窗，验证并启用。
-- 验证后直接编辑；`⋯` →「发布到 GitHub Pages」提交 `prototype/published-vault.js`；
+- 验证后直接编辑；点笔记页底部「发布」，或 `⋯` →「发布到 GitHub Pages」，提交 `prototype/published-vault.js`；
 - 约 1 分钟 Pages 更新，刷新/重开 PWA 可见；
 - 同一时间建议只在一台设备编辑并发布，避免覆盖。
 
