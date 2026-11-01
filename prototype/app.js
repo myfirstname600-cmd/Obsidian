@@ -3200,7 +3200,7 @@
       applyOwnerMode();
       setOwnerStatus('已连接，编辑模式已开启', true);
       closeOwnerModal();
-      toast('所有者编辑已开启；修改后可从 ⋯ 菜单发布');
+      toast('所有者编辑已开启；编辑后点底部「发布」提交');
     } catch (err) {
       setOwnerStatus(err.message || 'Token 验证失败', false);
       toast('连接失败：' + (err.message || 'GitHub 验证失败'));
