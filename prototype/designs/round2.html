@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>知识星图 · 两版留白方案</title>
+  <style>
+    :root {
+      --bg: #f2f1ec;
+      --panel: #fbfaf6;
+      --ink: #1d1c19;
+      --muted: #555149;
+      --faint: #6a655c;
+      --line: #d8d3c7;
+      --accent: #1d4ed8;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--ink); }
+    body {
+      font-family: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    .wrap { width: min(1320px, calc(100vw - 56px)); margin: 0 auto; }
+    header { padding: 52px 0 26px; border-bottom: 1px solid var(--line); }
+    .kicker {
+      font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      color: var(--faint);
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 4vw, 46px);
+      line-height: 1.1;
+      letter-spacing: -0.035em;
+      font-weight: 650;
+    }
+    .intro { max-width: 760px; margin: 0; color: var(--muted); font-size: 15px; line-height: 1.8; }
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px 24px;
+      align-items: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .meta-row a { color: var(--accent); border-bottom: 1px solid currentColor; padding-bottom: 1px; }
+    .notice {
+      margin-top: 20px;
+      padding: 12px 14px;
+      border-left: 2px solid var(--accent);
+      background: #fbfaf6;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      max-width: 760px;
+    }
+    main { padding: 28px 0 64px; }
+    .options { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; }
+    .option { min-width: 0; }
+    .option-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+    .num { font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace; font-size: 13px; color: var(--faint); }
+    h2 { margin: 0; font-size: 22px; letter-spacing: -0.02em; font-weight: 650; }
+    .style-tag { margin-left: auto; font-size: 13px; color: var(--faint); }
+    .shot {
+      display: block;
+      border: 1px solid var(--line);
+      background: #e7e5df;
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s;
+    }
+    .shot:hover { transform: translateY(-3px); box-shadow: 0 20px 44px rgba(30, 27, 22, 0.13); }
+    .shot img { display: block; width: 100%; height: auto; }
+    .option p { margin: 14px 0 0; color: var(--muted); font-size: 14px; line-height: 1.8; }
+    .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; }
+    .tags span { font-size: 12px; color: var(--faint); border: 1px solid var(--line); padding: 3px 9px; border-radius: 999px; }
+    .thumbs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .thumb { display: block; border: 1px solid var(--line); background: #e7e5df; overflow: hidden; }
+    .thumb img { display: block; width: 100%; height: auto; }
+    .open {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 15px;
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .open::after { content: "→"; }
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 22px 0 46px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    code { font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace; font-size: 12.5px; }
+    @media (max-width: 900px) {
+      .wrap { width: calc(100vw - 32px); }
+      header { padding-top: 34px; }
+      .options { grid-template-columns: 1fr; gap: 36px; }
+      .style-tag { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="kicker">ROUND 2 / AIRY WORKSPACE</div>
+      <h1>按你的反馈重做：两版留白方案</h1>
+      <p class="intro">
+        星图不再是主体，而是带交互的装饰/导航模块；四块数据也缩小。把大面积留给“工作区”——
+        未选择知识点时它保持安静留白，选中后编辑面板从工作区展开。两版结构相同，一浅一深；最终选定 <strong>08 Quiet</strong>。
+      </p>
+      <div class="meta-row">
+        <a href="index.html">← 返回第一轮 6 个方向</a>
+        <span>直接打开 <a href="../index.html?design=7">07 Air</a> · <a href="../index.html?design=8">08 Quiet</a></span>
+        <span>快捷键：画廊里按 7 / 8</span>
+      </div>
+      <div class="notice">
+        已选定 <strong>08 Quiet</strong>。当前原型已在此基础上落地 v0.5 交互：知识点改为独立页面（不弹抽屉）、新建直接落空白文件、
+        删除掌握度与复习、树可自由展开收起、分类可删除；星图、最近更新、数据概览都是黄金比例卡片；星图节点为带名称的圆形节点。下方截图是布局阶段，功能以当前原型为准。
+      </div>
+    </header>
+
+    <main class="options">
+      <section class="option">
+        <div class="option-head">
+          <span class="num">07</span>
+          <h2>Air</h2>
+          <span class="style-tag">浅色 · 阅读优先</span>
+        </div>
+        <a class="shot" href="../index.html?design=7" aria-label="打开 Air 设计">
+          <img src="../shots/design-7.png" alt="Air 设计：浅色留白布局，星图与四块数据缩在左侧" />
+        </a>
+        <p>
+          左侧分类栏之后，星图缩成一个小卡片，四块数据变成左下 2×2 小卡；右侧是整块留白工作区。
+          整体暖白、细线、低对比，像一张安静的学习桌面。
+        </p>
+        <div class="tags"><span>浅色</span><span>大留白</span><span>编辑优先</span><span>装饰性星图</span></div>
+        <div class="thumbs">
+          <a class="thumb" href="../index.html?design=7" aria-label="打开 Air 编辑状态">
+            <img src="../shots/design-7-panel.png" alt="Air 选中知识点后的编辑状态" />
+          </a>
+          <a class="thumb" href="../index.html?design=7" aria-label="打开 Air">
+            <img src="../shots/design-7.png" alt="Air 空状态" />
+          </a>
+        </div>
+        <a class="open" href="../index.html?design=7">打开 Air</a>
+      </section>
+
+      <section class="option">
+        <div class="option-head">
+          <span class="num">08</span>
+          <h2>Quiet</h2>
+          <span class="style-tag">深色 · 更低密度</span>
+        </div>
+        <a class="shot" href="../index.html?design=8" aria-label="打开 Quiet 设计">
+          <img src="../shots/design-8.png" alt="Quiet 设计：深色留白布局，顶部细长星图与一排小数据卡" />
+        </a>
+        <p>
+          星图变成顶部一条很矮的“星带”，四块数据压成一排小卡，下面留出大面积深色工作区。
+          整体是接近黑的工作台，只有琥珀色作为强调，适合长时间专注。
+        </p>
+        <div class="tags"><span>深色</span><span>低密度</span><span>专注</span><span>星带装饰</span></div>
+        <div class="thumbs">
+          <a class="thumb" href="../index.html?design=8" aria-label="打开 Quiet 编辑状态">
+            <img src="../shots/design-8-panel.png" alt="Quiet 选中知识点后的编辑状态" />
+          </a>
+          <a class="thumb" href="../index.html?design=8" aria-label="打开 Quiet">
+            <img src="../shots/design-8.png" alt="Quiet 空状态" />
+          </a>
+        </div>
+        <a class="open" href="../index.html?design=8">打开 Quiet</a>
+      </section>
+    </main>
+
+    <footer>
+      <span>两版共用同一套数据、星图、编辑、自动保存与实时刷新逻辑，仅布局和视觉不同。</span>
+      <span>双击这个页面即可离线打开；本地文件模式下相对链接也可用。</span>
+    </footer>
+  </div>
+  <script>
+    document.addEventListener('keydown', function (event) {
+      if (event.target && /input|textarea|select/i.test(event.target.tagName)) return;
+      if (event.key === '7') window.location.href = '../index.html?design=7';
+      if (event.key === '8') window.location.href = '../index.html?design=8';
+    });
+  </script>
+</body>
+</html>

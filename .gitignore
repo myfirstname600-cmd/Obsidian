@@ -1,0 +1,6 @@
+.DS_Store
+Thumbs.db
+*.zip
+prototype/shots/debug-*
+prototype/shots/resp-*
+prototype/shots/test-*

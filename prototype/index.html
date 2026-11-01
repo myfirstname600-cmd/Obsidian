@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-design="8">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="application-name" content="知识星图" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="知识星图" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%237c3aed'/%3E%3C/svg%3E" />
+  <title>知识星图 · 交互原型 v1.0（本地编辑 + 只读发布）</title>
+  <link rel="stylesheet" href="styles.css?v=17" />
+  <link rel="stylesheet" href="designs/designs.css?v=17" />
+  <link rel="stylesheet" href="obsidian.css?v=17" />
+</head>
+<body>
+  <div id="app">
+    <aside id="ribbon" aria-label="功能区">
+      <button id="ribbon-new" class="ribbon-btn" title="新建笔记" aria-label="新建笔记">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+      </button>
+      <button id="ribbon-search" class="ribbon-btn" title="搜索" aria-label="搜索">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l5 5"></path></svg>
+      </button>
+      <button id="ribbon-graph" class="ribbon-btn" title="知识网络" aria-label="知识网络">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="2.4"></circle><circle cx="18" cy="6" r="2.4"></circle><circle cx="18" cy="18" r="2.4"></circle><path d="M8.2 11L15.8 7M8.2 13l7.6 4"></path></svg>
+      </button>
+      <button id="ribbon-palette" class="ribbon-btn" title="命令面板 (Ctrl+P)" aria-label="命令面板">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h6v6H9zM9 9L6 6M15 9l3-3M9 15l-3 3M15 15l3 3"></path></svg>
+      </button>
+      <div class="ribbon-spacer"></div>
+      <button id="ribbon-install" class="ribbon-btn hidden" title="安装到桌面 / 主屏幕" aria-label="安装到桌面">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11M8 10l4 4 4-4M5 21h14"></path></svg>
+      </button>
+      <button id="ribbon-backup" class="ribbon-btn" title="导出备份" aria-label="导出备份">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v6M8 6l4-4 4 4M12 21v-6M8 18l4 4 4-4M3 12h6M6 8l-4 4 4 4M21 12h-6M18 8l4 4-4 4"></path></svg>
+      </button>
+      <button id="ribbon-settings" class="ribbon-btn" title="收起分类栏" aria-label="收起分类栏">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6l-6 6 6 6"></path></svg>
+      </button>
+    </aside>
+
+    <aside id="sidebar" aria-label="文件">
+      <div class="vault-head">
+        <div class="vault-title">
+          <span class="vault-chevron">▾</span>
+          <span>知识星图</span>
+        </div>
+        <div class="vault-actions">
+          <button id="vault-new" class="icon-btn" title="新建笔记" aria-label="新建笔记">＋</button>
+          <button id="sidebar-collapse" class="icon-btn desktop-only" title="收起分类栏" aria-label="收起分类栏" aria-expanded="true">«</button>
+          <button id="sidebar-close" class="icon-btn mobile-only" aria-label="关闭分类栏">✕</button>
+        </div>
+      </div>
+
+      <div class="sidebar-search">
+        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+        </svg>
+        <input id="search-input" type="search" placeholder="搜索知识点…" autocomplete="off" aria-label="搜索" />
+        <kbd>K</kbd>
+      </div>
+
+      <button id="sidebar-graph" class="sidebar-graph" type="button" title="打开知识网络">
+        <span class="sidebar-graph-icon">◉</span>
+        <span class="sidebar-graph-label">知识网络</span>
+        <span id="sidebar-graph-count" class="sidebar-graph-count"></span>
+      </button>
+
+      <div class="explorer-head">
+        <span>文件</span>
+      </div>
+
+      <div id="tree-section" class="tree-section">
+        <div id="category-tree" class="category-tree"></div>
+      </div>
+
+      <div id="search-results" class="search-results hidden">
+        <div class="section-label">搜索结果</div>
+        <div id="search-result-list" class="result-list"></div>
+      </div>
+
+      <div class="sidebar-foot">
+        <div id="stats" class="stats"></div>
+        <div class="sidebar-actions">
+          <button id="btn-add" class="btn primary side-add" title="新建知识点 (N)" aria-label="新建知识点">
+            <span class="plus">+</span>新建
+          </button>
+          <button id="btn-more" class="icon-btn side-more" title="数据与备份" aria-label="数据与备份" aria-haspopup="menu" aria-expanded="false">⋯</button>
+          <div id="more-menu" class="more-menu hidden" role="menu">
+            <button id="btn-export" class="more-item" role="menuitem">导出备份 JSON</button>
+            <button id="btn-import" class="more-item" role="menuitem">导入备份 JSON</button>
+            <div class="more-sep"></div>
+            <button id="btn-export-md" class="more-item" role="menuitem">导出 Obsidian Vault（.zip）</button>
+            <button id="btn-import-md" class="more-item" role="menuitem">导入 Markdown 笔记</button>
+            <button id="btn-publish" class="more-item" role="menuitem">导出发布快照</button>
+            <div class="more-sep"></div>
+            <button id="btn-reset" class="more-item danger-text" role="menuitem">恢复示例数据</button>
+          </div>
+          <input id="import-file" type="file" accept=".json,application/json" hidden />
+          <input id="import-md" type="file" accept=".md,.markdown,text/markdown" multiple hidden />
+        </div>
+      </div>
+    </aside>
+
+    <main id="workspace">
+      <header id="workspace-tabs">
+        <div id="editor-tabs" class="editor-tabs" role="tablist" aria-label="打开的标签"></div>
+        <div class="tab-actions">
+          <button id="tab-new" class="icon-btn" title="新建笔记" aria-label="新建笔记">＋</button>
+          <button id="tab-graph" class="icon-btn" title="打开知识网络" aria-label="打开知识网络">◉</button>
+        </div>
+      </header>
+
+      <section id="stage">
+      <button id="sidebar-expand" class="icon-btn sidebar-expand" title="展开分类栏" aria-label="展开分类栏">»</button>
+      <button id="sidebar-toggle" class="icon-btn sidebar-toggle mobile-only" aria-label="打开知识点分类">☰</button>
+
+      <div id="empty-workspace" class="empty-workspace hidden">
+        <div class="empty-mark">◈</div>
+        <div class="empty-title">没有打开的标签</div>
+        <p class="empty-desc">从左侧文件树打开一篇笔记，或者打开知识网络。</p>
+        <div class="empty-actions">
+          <button id="empty-new" class="btn">新建笔记</button>
+          <button id="empty-graph" class="btn primary">打开知识网络</button>
+          <button id="empty-switch" class="btn ghost">快速切换</button>
+          <button id="empty-install" class="btn ghost hidden">安装到桌面</button>
+        </div>
+        <div class="empty-hint"><kbd>Ctrl O</kbd> 快速切换 · <kbd>Ctrl P</kbd> 命令面板</div>
+      </div>
+
+      <section id="graph-wrap" aria-label="3D 知识星图">
+        <div id="graph"></div>
+        <div id="labels-layer" aria-hidden="true"></div>
+        <canvas id="graph-fallback" aria-label="知识网络 2D 兼容视图"></canvas>
+        <div id="graph-fallback-tag" class="graph-fallback-tag">2D 兼容视图</div>
+        <div class="vignette" aria-hidden="true"></div>
+
+        <div class="graph-tools">
+          <button id="btn-rotate" class="icon-btn active" title="暂停自动旋转" aria-label="暂停自动旋转">⟳</button>
+          <button id="btn-fit" class="icon-btn" title="适配视图" aria-label="适配视图">⤢</button>
+          <button id="btn-collapse-graph" class="icon-btn" title="收起图谱标签" aria-label="收起图谱标签">—</button>
+        </div>
+
+        <div id="graph-hint" class="graph-hint">
+          <span class="hint-dot"></span>拖拽旋转 · 滚轮缩放 · 点击节点打开知识点
+        </div>
+      </section>
+
+      <section id="data-grid" aria-label="其他数据">
+        <article class="data-card card-recent">
+          <div class="card-head">
+            <span class="card-label">最近更新</span>
+            <span class="card-sub" id="recent-count"></span>
+          </div>
+          <div id="recent-list" class="recent-list"></div>
+        </article>
+
+        <article class="data-card card-overview">
+          <div class="card-head">
+            <span class="card-label">数据概览</span>
+            <span class="card-sub">实时</span>
+          </div>
+          <div id="overview-grid" class="overview-grid"></div>
+        </article>
+      </section>
+
+      <div id="workspace-hint" aria-hidden="true">
+        <div class="workspace-kicker">WORKSPACE</div>
+        <div class="workspace-title">选择一个知识点</div>
+        <p class="workspace-desc">点击左侧分类下的文件，或星图上的节点；内容会在这里打开并直接编辑。</p>
+        <div class="workspace-meta"><kbd>N</kbd> 新建知识点 · <kbd>K</kbd> 搜索 · <kbd>Ctrl P</kbd> 命令面板 · <kbd>Ctrl O</kbd> 快速切换</div>
+      </div>
+
+      <aside id="detail-panel" aria-label="知识点页面">
+        <div class="panel-head">
+          <button id="panel-close" class="back-btn" title="返回星图 (Esc)">← 星图</button>
+          <div class="panel-head-left">
+            <span id="panel-category-chip" class="chip">—</span>
+            <span id="panel-updated" class="panel-updated"></span>
+          </div>
+          <button id="panel-source" class="icon-btn source-btn" title="Markdown 源码 (Ctrl+Shift+M)" aria-label="Markdown 源码">M↓</button>
+          <button id="panel-reading" class="icon-btn reading-btn" title="切换阅读视图 (Ctrl+E)" aria-label="切换阅读视图">▤</button>
+        </div>
+
+        <div class="note-content">
+        <div class="note-body">
+          <input id="kp-title" class="kp-title-input" type="text" placeholder="知识点标题" maxlength="100" aria-label="知识点标题" />
+
+          <div class="meta-row">
+            <label class="meta-field">
+              <span>分类</span>
+              <select id="kp-category-select" aria-label="所属分类"></select>
+            </label>
+            <label class="meta-field tags-field">
+              <span>标签</span>
+              <input id="kp-tags" type="text" placeholder="用逗号分隔，例如：进程, 并发" aria-label="标签" />
+            </label>
+          </div>
+
+          <div class="toolbar" role="toolbar" aria-label="格式工具栏">
+            <button type="button" data-cmd="bold" title="加粗"><b>B</b></button>
+            <button type="button" data-cmd="italic" title="斜体"><i>I</i></button>
+            <button type="button" data-cmd="strikeThrough" title="删除线"><s>S</s></button>
+            <span class="toolbar-divider"></span>
+            <button type="button" data-block="h2" title="二级标题">H2</button>
+            <button type="button" data-block="h3" title="三级标题">H3</button>
+            <span class="toolbar-divider"></span>
+            <button type="button" data-cmd="insertUnorderedList" title="无序列表">•</button>
+            <button type="button" data-cmd="insertOrderedList" title="有序列表">1.</button>
+            <button type="button" data-block="blockquote" title="引用">❝</button>
+            <button type="button" data-block="pre" title="代码块">&lt;/&gt;</button>
+            <span class="toolbar-divider"></span>
+            <button type="button" id="btn-wikilink" title="插入双向链接 [[知识点]]">[[ ]]</button>
+            <button type="button" id="btn-link" title="插入普通链接">🔗</button>
+            <button type="button" id="btn-image" title="插入图片">🖼</button>
+            <button type="button" id="btn-table" title="插入表格">⊞</button>
+            <button type="button" id="btn-formula" title="插入公式块">∑</button>
+            <button type="button" id="btn-mermaid" title="插入 Mermaid 图">◇</button>
+            <span class="toolbar-divider"></span>
+            <button type="button" data-cmd="removeFormat" title="清除格式">⌫</button>
+          </div>
+
+          <div id="editor" class="editor" contenteditable="true" spellcheck="false" role="textbox" aria-multiline="true" aria-label="知识点正文">
+            <p class="editor-placeholder">在这里直接编辑…</p>
+          </div>
+
+          <div id="markdown-source-wrap" class="markdown-source-wrap" aria-hidden="true">
+            <div class="markdown-source-head">
+              <span class="markdown-source-kicker">MARKDOWN</span>
+              <span class="markdown-source-hint">源码 · 实时预览</span>
+            </div>
+            <div class="markdown-source-grid">
+              <textarea id="markdown-source" class="markdown-source-input" spellcheck="false" aria-label="Markdown 源码"></textarea>
+              <div id="markdown-preview" class="editor markdown-preview" aria-label="Markdown 预览"></div>
+            </div>
+          </div>
+        </div>
+
+        <aside id="note-inspector" class="note-inspector" aria-label="笔记信息">
+          <section class="inspector-section">
+            <div class="inspector-head"><span>大纲</span><span id="outline-count" class="inspector-count">0</span></div>
+            <div id="note-outline" class="inspector-list"></div>
+          </section>
+          <section class="inspector-section">
+            <div class="inspector-head"><span>反向链接</span><span id="backlink-count" class="inspector-count">0</span></div>
+            <div id="note-backlinks" class="inspector-list"></div>
+          </section>
+          <section class="inspector-section">
+            <div class="inspector-head"><span>出链</span><span id="outlink-count" class="inspector-count">0</span></div>
+            <div id="note-outlinks" class="inspector-list"></div>
+          </section>
+        </aside>
+        </div>
+
+        <div class="panel-foot">
+          <span id="save-status" class="save-status">—</span>
+          <div class="panel-actions">
+            <button id="btn-history" class="btn tiny" title="查看版本历史">历史 <span id="history-count" class="history-count">0</span></button>
+            <button id="btn-delete" class="btn tiny danger" title="删除知识点">删除</button>
+          </div>
+        </div>
+      </aside>
+      </section>
+
+      <footer id="workspace-status">
+        <span id="status-file">知识网络</span>
+        <span id="status-backlinks"></span>
+        <span id="status-words"></span>
+        <span class="status-spacer"></span>
+        <span id="status-network">在线</span>
+        <span id="status-save">已保存</span>
+        <span id="status-vault">知识星图</span>
+      </footer>
+    </main>
+  </div>
+
+  <div id="mobile-overlay" class="mobile-overlay hidden"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div id="history-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="history-title">
+    <div class="modal-backdrop" data-close-history></div>
+    <div class="modal-card history-modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="history-eyebrow">VERSIONS</div>
+          <h2 id="history-title">版本历史</h2>
+        </div>
+        <button id="history-close" class="icon-btn" aria-label="关闭版本历史">✕</button>
+      </div>
+      <div id="history-list" class="history-list"></div>
+      <div class="history-foot">
+        <span>停止输入后自动保存，并在每次保存时记录版本；最多保留 40 个。</span>
+        <span class="history-local">仅存当前浏览器</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="command-palette" class="palette hidden" role="dialog" aria-modal="true" aria-labelledby="palette-title">
+    <div class="palette-backdrop" data-close-palette></div>
+    <div class="palette-card">
+      <div class="palette-input-row">
+        <span id="palette-title" class="palette-mode">命令</span>
+        <input id="palette-input" type="text" autocomplete="off" spellcheck="false" placeholder="输入命令或搜索知识点…" aria-label="命令面板输入" />
+      </div>
+      <div id="palette-list" class="palette-list" role="listbox"></div>
+      <div class="palette-foot">
+        <span><kbd>↑</kbd><kbd>↓</kbd> 选择</span>
+        <span><kbd>↵</kbd> 执行</span>
+        <span><kbd>esc</kbd> 关闭</span>
+        <span class="palette-hint"><kbd>Ctrl</kbd>+<kbd>P</kbd> 命令 · <kbd>Ctrl</kbd>+<kbd>O</kbd> 快速切换</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="vendor/3d-force-graph.min.js?v=17"></script>
+  <script src="vendor/jszip.min.js?v=17"></script>
+  <script src="data.js?v=17"></script>
+  <script src="published-vault.js?v=17"></script>
+  <script src="markdown.js?v=17"></script>
+  <script src="app.js?v=17"></script>
+  <script>
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('./service-worker.js', { scope: './' }).catch(function () {
+          /* file://、隐私模式或本地静态服务可能不支持 SW */
+        });
+      });
+    }
+  </script>
+</body>
+</html>
